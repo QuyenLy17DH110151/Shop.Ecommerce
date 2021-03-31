@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Ecommerce.WebApp.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Shop.Ecommerce.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Shop.Ecommerce.Controllers
+namespace Ecommerce.WebApp.Controllers
 {
     public class HomeController : Controller
     {
