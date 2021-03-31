@@ -7,13 +7,13 @@ using System.Text;
 
 namespace Ecommerce.Data.Configurations
 {
-    class AppRoleConfiguration : IEntityTypeConfiguration<AppRole>
+    public class AppRoleConfiguration : IEntityTypeConfiguration<AppRole>
     {
         public void Configure(EntityTypeBuilder<AppRole> builder)
         {
             // Đặt tên bảng
             builder.ToTable("AppRoles");
-           
+
         }
     }
 }

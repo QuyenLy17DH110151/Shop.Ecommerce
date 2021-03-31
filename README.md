@@ -5,5 +5,5 @@
 ##STEP 2 : TIER DATA
 - Install 3 Package
 - Create file dbcontext --> fundamentals --> entity --> configurations
-
+- Migration --> seting Connection String --> DbContextFactory
 
