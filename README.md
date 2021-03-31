@@ -4,6 +4,6 @@
 -Create solution structure
 ##STEP 2 : TIER DATA
 - Install 3 Package
-- Create file dbcontext --> fundamentals
+- Create file dbcontext --> fundamentals --> entity --> configurations
 
 
