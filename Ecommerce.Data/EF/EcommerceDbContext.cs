@@ -1,5 +1,7 @@
 ﻿using Ecommerce.Data.Configurations;
 using Ecommerce.Data.Entities;
+using Ecommerce.Data.Extension;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -32,6 +34,16 @@ namespace Ecommerce.Data.EF
             modelBuilder.ApplyConfiguration(new AppUserConfiguration());
             modelBuilder.ApplyConfiguration(new AppRoleConfiguration());
             modelBuilder.ApplyConfiguration(new ProductImageConfiguration());
+            #endregion
+
+            #region Data_Seeding
+            modelBuilder.Seed();
+
+            modelBuilder.Entity<IdentityUserClaim<Guid>>().ToTable("AppUserClaim");
+            modelBuilder.Entity<IdentityUserRole<Guid>>().ToTable("AppUserRole").HasKey(x => new { x.UserId, x.RoleId });
+            modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("AppUserLogin").HasKey(x => x.UserId);
+            modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("AppRoleClaim");
+            modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("AppUserToken").HasKey(x => x.UserId);
             #endregion
             //base.OnModelCreating(modelBuilder);
         }
