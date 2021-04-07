@@ -1,23 +1,35 @@
-﻿using Ecommerce.Application.Catalog.Products.Dtos;
-using Ecommerce.Application.Catalog.Products.Dtos.Manage;
-using Ecommerce.Application.CommonDtos;
+﻿using Ecommerce.Application.Common;
 using Ecommerce.Data.EF;
+using Ecommerce.Data.Entities;
 using Ecommerce.Utilities.Exceptions;
+using Ecommerce.ViewModel.Catalog.Product;
+using Ecommerce.ViewModel.Catalog.Product.Manage;
+using Ecommerce.ViewModel.Common;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.IO;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Catalog.Products
 {
     public class ManageProductService : IManageProductService
     {
         private readonly EcommerceDBContext _ecommerceDbContext;
+        private readonly IStorageService _storageService;
 
-        public ManageProductService(EcommerceDBContext ecommerceDbContext)
+        public ManageProductService(EcommerceDBContext ecommerceDbContext, IStorageService storageService)
         {
             _ecommerceDbContext = ecommerceDbContext;
+            _storageService = storageService;
+        }
+
+        public Task<int> AddImage(int productId, List<IFormFile> files)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task AddViewCount(int productId)
@@ -37,7 +49,7 @@ namespace Ecommerce.Application.Catalog.Products
                 ViewCount = 0,
                 DateCreated = DateTime.UtcNow,
                 SeoAlias = request.SeoAlias,
-                ProductTranslations = new List<Data.Entities.ProductTranslation>
+                ProductTranslations = new List<ProductTranslation>
                 {
                     new Data.Entities.ProductTranslation()
                     {
@@ -51,12 +63,30 @@ namespace Ecommerce.Application.Catalog.Products
                     }
                 }
             };
+
+            //Save Image
+            if (request.ThumbnailImage != null)
+            {
+                product.ProductImages = new List<ProductImage>()
+                {
+                    new ProductImage()
+                    {
+                        Caption = "Thumbnail image",
+                        DateCreated = DateTime.Now,
+                        FileSize = request.ThumbnailImage.Length,
+                        ImagePath = await this.SaveFile(request.ThumbnailImage),
+                        IsDefault = true,
+                        SortOrder = 1
+                    }
+                };
+            }
+
             _ecommerceDbContext.Add(product);
             await _ecommerceDbContext.SaveChangesAsync();
             return 0;
         }
 
-        public async Task<int> Delete(Guid productId)
+        public async Task<int> Delete(int productId)
         {
             var product = await _ecommerceDbContext.Products.FindAsync(productId);
             if (product == null)
@@ -68,6 +98,13 @@ namespace Ecommerce.Application.Catalog.Products
                 _ecommerceDbContext.Products.Remove(product);
                 return await _ecommerceDbContext.SaveChangesAsync();
             }
+
+            var images = _ecommerceDbContext.ProductImages.Where(i => i.ProductId == productId);
+            foreach (var image in images)
+            {
+                await _storageService.DeleteFileAsync(image.ImagePath);
+            }
+
         }
 
         public Task<List<ProductViewModel>> GetAll()
@@ -124,22 +161,47 @@ namespace Ecommerce.Application.Catalog.Products
             return pagingResult;
         }
 
+        public Task<int> RemoveImage(int imageId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<int> Update(ProductUpdateRequest request)
         {
             var product = await _ecommerceDbContext.Products.FindAsync(request.Id);
-            var productTranlastion = await _ecommerceDbContext.ProductTranslations.FirstOrDefaultAsync(x => x.Product.Id == request.Id &&
-            x.LanguageId == request.LanguageId);
+            var productTranlastion = await _ecommerceDbContext.ProductTranslations.FirstOrDefaultAsync(
+            x => x.Product.Id == request.Id 
+            && x.LanguageId == request.LanguageId);
             if (product == null || productTranlastion == null)
             {
                 throw new EcommerceException($"Cannot find a product with id : {request.Id}");
             }
+
             productTranlastion.Name = request.Name;
             productTranlastion.SeoAlias = request.SeoAlias;
             productTranlastion.SeoDescription = request.SeoDescription;
             productTranlastion.SeoTitle = request.SeoTitle;
             productTranlastion.Description = request.Description;
             productTranlastion.Details = request.Details;
+
+            //Save image
+            if (request.ThumbnailImage != null)
+            {
+                var thumbnailImage = await _ecommerceDbContext.ProductImages.FirstOrDefaultAsync(i => i.IsDefault == true && i.ProductId == request.Id);
+                if (thumbnailImage != null)
+                {
+                    thumbnailImage.FileSize = request.ThumbnailImage.Length;
+                    thumbnailImage.ImagePath = await this.SaveFile(request.ThumbnailImage);
+                    _ecommerceDbContext.ProductImages.Update(thumbnailImage);
+                }
+            }
+
             return await _ecommerceDbContext.SaveChangesAsync();
+        }
+
+        public Task<int> UpdateImage(int imageId, string caption, bool isDefault)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<bool> UpdatePrice(int productId, decimal newPrice)
@@ -162,6 +224,13 @@ namespace Ecommerce.Application.Catalog.Products
             }
             product.Stock += addedQuantity;
             return await _ecommerceDbContext.SaveChangesAsync() > 0;
+        }
+        private async Task<string> SaveFile(IFormFile file)
+        {
+            var originalFileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(originalFileName)}";
+            await _storageService.SaveFileAsync(file.OpenReadStream(), fileName);
+            return fileName;
         }
     }
 }

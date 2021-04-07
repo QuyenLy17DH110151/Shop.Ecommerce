@@ -1,13 +1,11 @@
-﻿using Ecommerce.Application.Catalog.Products.Dtos;
-using Ecommerce.Application.CommonDtos;
-using Ecommerce.Data.EF;
-using System;
+﻿using Ecommerce.Data.EF;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Ecommerce.Application.Catalog.Products.Dtos.Public;
+using Ecommerce.ViewModel.Catalog.Product;
+using Ecommerce.ViewModel.Common;
+using Ecommerce.ViewModel.Catalog.Product.Public;
 
 namespace Ecommerce.Application.Catalog.Products
 {
