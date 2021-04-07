@@ -59,7 +59,7 @@ namespace Ecommerce.Application.Catalog.Products
         public async Task<int> Delete(Guid productId)
         {
             var product = await _ecommerceDbContext.Products.FindAsync(productId);
-            if (product==null)
+            if (product == null)
             {
                 throw new EcommerceException($"Cannot find a product : {productId}");
             }
@@ -85,13 +85,13 @@ namespace Ecommerce.Application.Catalog.Products
                         on p.Id equals pic.ProductId
                         join c in _ecommerceDbContext.Categories
                         on pic.CategoryId equals c.Id
-                        select new { p, pt ,pic };
+                        select new { p, pt, pic };
             //filter
             if (!String.IsNullOrEmpty(request.Keyword))
             {
                 query = query.Where(x => x.pt.Name.Contains(request.Keyword));
             }
-            if (request.CategoryId.Count>0)
+            if (request.CategoryId.Count > 0)
             {
                 query = query.Where(p => request.CategoryId.Contains(p.pic.CategoryId));
             }
@@ -100,19 +100,20 @@ namespace Ecommerce.Application.Catalog.Products
             var data = await query
                 .Skip((request.PageIndex - 1) * request.PageSize)
                 .Take(request.PageSize)
-                .Select(x=>new ProductViewModel() { 
-                  Id=x.p.Id, 
-                  Name=x.pt.Name,
-                  DateCreated=x.p.DateCreated,
-                  Description = x.pt.Description,
-                  Details=x.pt.Details,
-                  LanguageId=x.pt.LanguageId,
-                  OriginalPrice=x.p.OriginalPrice,
-                  Price=x.p.Price,
-                  SeoDescription=x.pt.SeoDescription,
-                  SeoTitle=x.pt.SeoTitle,
-                  Stock = x.p.Stock,
-                  ViewCount=x.p.ViewCount
+                .Select(x => new ProductViewModel()
+                {
+                    Id = x.p.Id,
+                    Name = x.pt.Name,
+                    DateCreated = x.p.DateCreated,
+                    Description = x.pt.Description,
+                    Details = x.pt.Details,
+                    LanguageId = x.pt.LanguageId,
+                    OriginalPrice = x.p.OriginalPrice,
+                    Price = x.p.Price,
+                    SeoDescription = x.pt.SeoDescription,
+                    SeoTitle = x.pt.SeoTitle,
+                    Stock = x.p.Stock,
+                    ViewCount = x.p.ViewCount
                 }).ToListAsync();
             //Select and projection
             var pagingResult = new PageResult<ProductViewModel>()
@@ -123,14 +124,44 @@ namespace Ecommerce.Application.Catalog.Products
             return pagingResult;
         }
 
-        public Task<int> Update(ProductUpdateRequest request)
+        public async Task<int> Update(ProductUpdateRequest request)
         {
-            throw new NotImplementedException();
+            var product = await _ecommerceDbContext.Products.FindAsync(request.Id);
+            var productTranlastion = await _ecommerceDbContext.ProductTranslations.FirstOrDefaultAsync(x => x.Product.Id == request.Id &&
+            x.LanguageId == request.LanguageId);
+            if (product == null || productTranlastion == null)
+            {
+                throw new EcommerceException($"Cannot find a product with id : {request.Id}");
+            }
+            productTranlastion.Name = request.Name;
+            productTranlastion.SeoAlias = request.SeoAlias;
+            productTranlastion.SeoDescription = request.SeoDescription;
+            productTranlastion.SeoTitle = request.SeoTitle;
+            productTranlastion.Description = request.Description;
+            productTranlastion.Details = request.Details;
+            return await _ecommerceDbContext.SaveChangesAsync();
         }
 
-        public Task<bool> UpdatePrice(int productId, decimal newPrice)
+        public async Task<bool> UpdatePrice(int productId, decimal newPrice)
         {
-            throw new NotImplementedException();
+            var product = await _ecommerceDbContext.Products.FindAsync(productId);
+            if (product == null)
+            {
+                throw new EcommerceException($"Cannot find a product with id : {productId}");
+            }
+            product.Price = newPrice;
+            return await _ecommerceDbContext.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> UpdateStock(int productId, int addedQuantity)
+        {
+            var product = await _ecommerceDbContext.Products.FindAsync(productId);
+            if (product == null)
+            {
+                throw new EcommerceException($"Cannot find a product with id : {productId}");
+            }
+            product.Stock += addedQuantity;
+            return await _ecommerceDbContext.SaveChangesAsync() > 0;
         }
     }
 }
