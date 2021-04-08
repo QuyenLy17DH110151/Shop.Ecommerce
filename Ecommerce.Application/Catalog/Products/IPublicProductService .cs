@@ -1,11 +1,12 @@
-﻿using Ecommerce.Application.Catalog.Products.Dtos;
-using Ecommerce.Application.Catalog.Products.Dtos.Manage;
-using Ecommerce.Application.CommonDtos;
+﻿using Ecommerce.ViewModel.Catalog.Product;
+using Ecommerce.ViewModel.Catalog.Product.Public;
+using Ecommerce.ViewModel.Common;
+using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Catalog.Products
 {
     public interface IPublicProductService
     {
-        PageResult<ProductViewModel> GetAllByCategoryId(GetProductPagingRequest request);
+        Task<PageResult<ProductViewModel>> GetAllByCategoryId(GetProductPagingRequest request);
     }
 }
