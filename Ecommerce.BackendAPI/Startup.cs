@@ -1,4 +1,5 @@
 using Ecommerce.Application.Catalog.Products;
+using Ecommerce.Application.Common;
 using Ecommerce.BackendAPI.Constants;
 using Ecommerce.Data.EF;
 using Microsoft.AspNetCore.Builder;
@@ -33,7 +34,9 @@ namespace Ecommerce.BackendAPI
             services.AddDbContext<EcommerceDBContext>(
                 options => options.UseSqlServer(Configuration.GetConnectionString(SystemConstants.MainConnectionString)));
             //Declare DI
+            services.AddTransient<IStorageService, FileStorageService>();
             services.AddTransient<IPublicProductService, PublicProductService>();
+            services.AddTransient<IManageProductService, ManageProductService>();
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen();
         }

@@ -18,7 +18,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ecommerce.Utilities", "Ecom
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ecommerce.ViewModel", "Ecommerce.ViewModel\Ecommerce.ViewModel.csproj", "{0486B3EA-7EA9-4EF0-86F3-33CD73788A91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.BackendAPI", "Ecommerce.BackendAPI\Ecommerce.BackendAPI.csproj", "{64FFB90B-D2B5-40BF-BCE9-651CB7A6B1D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ecommerce.BackendAPI", "Ecommerce.BackendAPI\Ecommerce.BackendAPI.csproj", "{64FFB90B-D2B5-40BF-BCE9-651CB7A6B1D9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1.Infrastucture", "1.Infrastucture", "{62AB73C6-7297-48BC-B525-BBCF18EDCD1C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2.Domain", "2.Domain", "{C6B865A2-58B7-42D3-9AFF-C0B456F4C5EF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.Hosts", "3.Hosts", "{613E910D-A4DC-4FB6-A9CF-36F3594013BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +59,14 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{499D293E-695D-4354-9E72-D0B21149014F} = {613E910D-A4DC-4FB6-A9CF-36F3594013BC}
+		{99E9D429-78ED-4424-BF09-BD54958E0F43} = {C6B865A2-58B7-42D3-9AFF-C0B456F4C5EF}
+		{98CD3E81-A2AE-40D8-9427-C65165C73C55} = {C6B865A2-58B7-42D3-9AFF-C0B456F4C5EF}
+		{BCD0D438-D82E-4251-A1B2-C39946C9AFAC} = {62AB73C6-7297-48BC-B525-BBCF18EDCD1C}
+		{0486B3EA-7EA9-4EF0-86F3-33CD73788A91} = {62AB73C6-7297-48BC-B525-BBCF18EDCD1C}
+		{64FFB90B-D2B5-40BF-BCE9-651CB7A6B1D9} = {613E910D-A4DC-4FB6-A9CF-36F3594013BC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7EFEA001-756C-4AEA-975A-BBAE6AAFD50D}

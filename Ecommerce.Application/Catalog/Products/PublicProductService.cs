@@ -17,7 +17,7 @@ namespace Ecommerce.Application.Catalog.Products
             _ecommerceDbContext = ecommerceDbContext;
         }
 
-        public async Task<List<ProductViewModel>> GetAll()
+        public async Task<List<ProductViewModel>> GetAll(string languageId)
         {
             var query = from p in _ecommerceDbContext.Products
                         join pt in _ecommerceDbContext.ProductTranslations
@@ -28,7 +28,7 @@ namespace Ecommerce.Application.Catalog.Products
                         on pic.CategoryId equals c.Id
                         select new { p, pt, pic };
 
-            var data = await query
+            var data = await query.Where(x=>x.pt.LanguageId==languageId)
                  .Select(x => new ProductViewModel()
                  {
                      Id = x.p.Id,
