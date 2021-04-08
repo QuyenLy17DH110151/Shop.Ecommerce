@@ -3,7 +3,6 @@ using Ecommerce.Data.EF;
 using Ecommerce.Data.Entities;
 using Ecommerce.Utilities.Exceptions;
 using Ecommerce.ViewModel.Catalog.Product;
-using Ecommerce.ViewModel.Catalog.Product.Manage;
 using Ecommerce.ViewModel.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -112,7 +111,7 @@ namespace Ecommerce.Application.Catalog.Products
             throw new NotImplementedException();
         }
 
-        public async Task<PageResult<ProductViewModel>> GetAllPaging(GetProductPagingRequest request)
+        public async Task<PageResult<ProductViewModel>> GetAllPaging(GetManageProductPagingRequest request)
         {
             // Select - join
             var query = from p in _ecommerceDbContext.Products
@@ -159,6 +158,11 @@ namespace Ecommerce.Application.Catalog.Products
                 Items = data,
             };
             return pagingResult;
+        }
+
+        public Task<ProductImageViewModel> GetListImage(int productId)
+        {
+            throw new NotImplementedException();
         }
 
         public Task<int> RemoveImage(int imageId)

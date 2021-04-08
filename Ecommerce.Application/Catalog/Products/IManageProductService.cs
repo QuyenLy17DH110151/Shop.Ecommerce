@@ -1,5 +1,4 @@
 ﻿using Ecommerce.ViewModel.Catalog.Product;
-using Ecommerce.ViewModel.Catalog.Product.Manage;
 using Ecommerce.ViewModel.Common;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -17,7 +16,7 @@ namespace Ecommerce.Application.Catalog.Products
         Task<bool> UpdateStock(int productId, int addedQuantity);
         Task AddViewCount(int productId);
         Task<List<ProductViewModel>> GetAll();
-        Task<PageResult<ProductViewModel>> GetAllPaging(GetProductPagingRequest request);
+        Task<PageResult<ProductViewModel>> GetAllPaging(GetManageProductPagingRequest request);
         Task<int> AddImage(int productId, List<IFormFile> files);
         Task<int> RemoveImage(int imageId);
         Task<int> UpdateImage(int imageId, string caption,bool isDefault);
