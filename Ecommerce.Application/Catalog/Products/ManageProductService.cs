@@ -82,7 +82,7 @@ namespace Ecommerce.Application.Catalog.Products
 
             _ecommerceDbContext.Add(product);
             await _ecommerceDbContext.SaveChangesAsync();
-            return 0;
+            return product.Id;
         }
 
         public async Task<int> Delete(int productId)
@@ -95,14 +95,15 @@ namespace Ecommerce.Application.Catalog.Products
             else
             {
                 _ecommerceDbContext.Products.Remove(product);
+                var images = _ecommerceDbContext.ProductImages.Where(i => i.ProductId == productId);
+                foreach (var image in images)
+                {
+                    await _storageService.DeleteFileAsync(image.ImagePath);
+                }
                 return await _ecommerceDbContext.SaveChangesAsync();
             }
 
-            var images = _ecommerceDbContext.ProductImages.Where(i => i.ProductId == productId);
-            foreach (var image in images)
-            {
-                await _storageService.DeleteFileAsync(image.ImagePath);
-            }
+          
 
         }
 
@@ -158,6 +159,30 @@ namespace Ecommerce.Application.Catalog.Products
                 Items = data,
             };
             return pagingResult;
+        }
+
+        public async Task<ProductViewModel> GetById(int productId,string languageId)
+        {
+            var product = await _ecommerceDbContext.Products.FindAsync(productId);
+            var productTranlastion = await _ecommerceDbContext.ProductTranslations.FirstOrDefaultAsync(
+            x => x.Product.Id == productId
+            && x.LanguageId == languageId);
+            var result = new ProductViewModel()
+            {
+                Id = product.Id,
+                Name = productTranlastion.Name != null ? productTranlastion.Name : null ,
+                DateCreated = product.DateCreated,
+                Description = productTranlastion.Description !=null ? productTranlastion.Description : null ,
+                Details = productTranlastion.Details !=null ? productTranlastion.Details:null,
+                LanguageId = productTranlastion.LanguageId !=null ? productTranlastion.LanguageId : null,
+                OriginalPrice = product.OriginalPrice,
+                Price = product.Price,
+                SeoDescription = productTranlastion.SeoDescription !=null ? productTranlastion.SeoDescription : null ,
+                SeoTitle = productTranlastion.SeoTitle !=null ? productTranlastion.SeoTitle : null ,
+                Stock = product.Stock,
+                ViewCount = product.ViewCount
+            };
+            return result;
         }
 
         public Task<ProductImageViewModel> GetListImage(int productId)
