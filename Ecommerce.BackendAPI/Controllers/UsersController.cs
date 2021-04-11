@@ -23,7 +23,7 @@ namespace Ecommerce.BackendAPI.Controllers
 
         [HttpPost("Authenticate")]
         [AllowAnonymous]
-        public async Task<IActionResult> Authenticate([FromForm] LoginRequest request)
+        public async Task<IActionResult> Authenticate([FromBody] LoginRequest request)
         {
             var resultToken = await _userService.Authencate(request);
             if (string.IsNullOrEmpty(resultToken))
@@ -35,7 +35,7 @@ namespace Ecommerce.BackendAPI.Controllers
 
         [HttpPost("Register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromForm] RegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
             var result = await _userService.Register(request);
             if (result == false)
