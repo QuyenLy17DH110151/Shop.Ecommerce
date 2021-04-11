@@ -1,4 +1,5 @@
-﻿using Ecommerce.ViewModel.System.Users;
+﻿using Ecommerce.ViewModel.Common;
+using Ecommerce.ViewModel.System.Users;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,5 +11,6 @@ namespace Ecommerce.Application.System
     {
         Task<string> Authencate(LoginRequest request);
         Task<bool> Register(RegisterRequest request);
+        Task<PageResult<UserVm>> GetUserPaging(GetUserPagingRequest request);
     }
 }

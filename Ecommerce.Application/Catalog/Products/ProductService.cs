@@ -16,12 +16,12 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Catalog.Products
 {
-    public class ManageProductService : IManageProductService
+    public class ProductService : IProductService
     {
         private readonly EcommerceDBContext _ecommerceDbContext;
         private readonly IStorageService _storageService;
 
-        public ManageProductService(EcommerceDBContext ecommerceDbContext, IStorageService storageService)
+        public ProductService(EcommerceDBContext ecommerceDbContext, IStorageService storageService)
         {
             _ecommerceDbContext = ecommerceDbContext;
             _storageService = storageService;
@@ -44,7 +44,7 @@ namespace Ecommerce.Application.Catalog.Products
                 productImage.FileSize = request.FileImage.Length;
             }
             _ecommerceDbContext.ProductImages.Add(productImage);
-             await _ecommerceDbContext.SaveChangesAsync();
+            await _ecommerceDbContext.SaveChangesAsync();
             return productImage.Id;
         }
 
@@ -122,6 +122,51 @@ namespace Ecommerce.Application.Catalog.Products
 
 
 
+        }
+
+        public async Task<PageResult<ProductViewModel>> GetAllByCategoryId(string languageId, GetPublicProductPagingRequest request)
+        {
+            //1. Select join
+            var query = from p in _ecommerceDbContext.Products
+                        join pt in _ecommerceDbContext.ProductTranslations on p.Id equals pt.ProductId
+                        join pic in _ecommerceDbContext.ProductInCategories on p.Id equals pic.ProductId
+                        join c in _ecommerceDbContext.Categories on pic.CategoryId equals c.Id
+                        where pt.LanguageId == languageId
+                        select new { p, pt, pic };
+            //2. filter
+            if (request.CategoryId.HasValue && request.CategoryId.Value > 0)
+            {
+                query = query.Where(p => p.pic.CategoryId == request.CategoryId);
+            }
+            //3. Paging
+            int totalRow = await query.CountAsync();
+
+            var data = await query.Skip((request.PageIndex - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(x => new ProductViewModel()
+                {
+                    Id = x.p.Id,
+                    Name = x.pt.Name,
+                    DateCreated = x.p.DateCreated,
+                    Description = x.pt.Description,
+                    Details = x.pt.Details,
+                    LanguageId = x.pt.LanguageId,
+                    OriginalPrice = x.p.OriginalPrice,
+                    Price = x.p.Price,
+                    SeoAlias = x.pt.SeoAlias,
+                    SeoDescription = x.pt.SeoDescription,
+                    SeoTitle = x.pt.SeoTitle,
+                    Stock = x.p.Stock,
+                    ViewCount = x.p.ViewCount
+                }).ToListAsync();
+
+            //4. Select and projection
+            var pagedResult = new PageResult<ProductViewModel>()
+            {
+                TotalRecord = totalRow,
+                Items = data
+            };
+            return pagedResult;
         }
 
         public async Task<PageResult<ProductViewModel>> GetAllPaging(GetManageProductPagingRequest request)
@@ -205,7 +250,8 @@ namespace Ecommerce.Application.Catalog.Products
                 throw new EcommerceException($"Cannot found Image_Product with id : {imageId}");
             }
             var productImage = await _ecommerceDbContext.ProductImages.FirstOrDefaultAsync(x => x.Id == imageId);
-            var result = new ProductImageViewModel() {
+            var result = new ProductImageViewModel()
+            {
                 Caption = productImage.Caption,
                 DateCreated = productImage.DateCreated,
                 FileSize = productImage.FileSize,
