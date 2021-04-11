@@ -43,6 +43,7 @@ namespace Ecommerce.Application.System
                 new Claim(ClaimTypes.Email,user.Email),
                 new Claim(ClaimTypes.Name,user.FristName),
                 new Claim(ClaimTypes.Role,string.Join(";",role)),
+                new Claim(ClaimTypes.Name,user.UserName),
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
