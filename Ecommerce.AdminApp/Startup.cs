@@ -1,4 +1,5 @@
 using Ecommerce.AdminApp.Service;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -25,6 +26,12 @@ namespace Ecommerce.AdminApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpClient();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+              .AddCookie(options =>
+              {
+                  options.LoginPath = "/User/Login/";
+                  options.AccessDeniedPath = "/User/Forbidden/";
+              });
             services.AddTransient<IUserAPIClient, UserAPIClient>();
             services.AddControllersWithViews();
         }
@@ -44,6 +51,8 @@ namespace Ecommerce.AdminApp
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseAuthentication();
 
             app.UseRouting();
 
