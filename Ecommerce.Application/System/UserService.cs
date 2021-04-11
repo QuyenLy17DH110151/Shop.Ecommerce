@@ -67,7 +67,7 @@ namespace Ecommerce.Application.System
                 UserName = request.UserName,
                 PhoneNumber = request.PhoneNumber
             };
-            var result = await _userManager.CreateAsync(user, request.PassWord);
+            var result = await _userManager.CreateAsync(user, request.Password);
             if (result.Succeeded)
             {
                 return true;
